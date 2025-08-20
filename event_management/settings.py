@@ -99,6 +99,13 @@ WSGI_APPLICATION = 'event_management.wsgi.application'
 # }
 
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3', 
+    }
+}
+
 # DATABASES = {
 #     'default': dj_database_url.config(
 #         # Replace this value with your local database's connection string.
@@ -108,12 +115,16 @@ WSGI_APPLICATION = 'event_management.wsgi.application'
 # }
 
 #FOR SUPABASE
-
-DATABASES = {
-    'default': dj_database_url.parse(config('DATABASE_URL'), ssl_require=True)
-}
-
-
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'mid_management',  
+#         'USER': 'postgres',        
+#         'PASSWORD': 'password',       
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # DATABASES = {
@@ -186,3 +197,8 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 FRONTEND_URL = 'http://127.0.0.1:8000/'
 
 
+LOGIN_URL = '/users/sign-in/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'  
+
+AUTH_USER_MODEL = 'users.CustomUser'

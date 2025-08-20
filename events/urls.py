@@ -5,13 +5,21 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('dashboard/', views.dashboard, name='dashboard'),
 
-    path('events/', views.event_list, name='event_list'),  
+    # path('event_list/', views.event_list, name='event_list'), 
+    
+    path('event_list/', views.EventList.as_view(), name='event_list'),
+    path('events/<int:id>/', views.EventDetail.as_view(), name='event_detail'), 
 
-    path('events/create/', views.create_event, name='create_event'),
-    path('events/<int:id>/update/', views.update_event, name='update_event'),
-    path('events/<int:id>/delete/', views.delete_event, name='delete_event'),
 
-    path('events/<int:id>/', views.event_detail, name='event_detail'), 
+    # path('events/create/', views.create_event, name='create_event'),
+    path('events/create/', views.CreateEvent.as_view(), name='create_event'),
+    
+    # path('events/<int:id>/update/', views.update_event, name='update_event'),
+    path('events/<int:id>/update/', views.UpdateEvent.as_view(), name='update_event'),
+    #path('events/<int:id>/delete/', views.delete_event, name='delete_event'),
+    path('events/<int:id>/delete/', views.DeleteEvent.as_view(), name='delete_event'),
+
+  
     path('events/<int:id>/rsvp/', views.rsvp_event, name='rsvp_event'),
 
     # Uncomment and fix participant URLs if needed

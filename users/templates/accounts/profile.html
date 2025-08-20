@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block title %}Profile{% endblock title %}
+{% block content %}
+
+<div class="bg-slate-900 text-slate-200 min-h-screen p-6">
+
+  <div class="text-center my-6">
+    <h1 class="text-3xl font-bold text-blue-500 mb-2">My Profile</h1>
+    <hr class="border-t-2 border-sky-400 w-1/2 mx-auto my-4">
+  </div>
+
+  <div class="flex flex-col items-center mb-8 space-y-4">
+    <!-- Profile Picture -->
+    <div class="rounded-full bg-sky-400 flex items-center justify-center w-32 h-32 overflow-hidden">
+      {% if profile_image %}
+    <img src="{{ profile_image.url }}" alt="Profile Picture" class="object-cover w-full h-full rounded-full">
+{% else %}
+    <img src="/media/profile_image/default.jpg" alt="Default Profile Picture" class="object-cover w-full h-full rounded-full">
+{% endif %}
+
+    </div>
+
+    <p class="text-xl font-bold text-white">Name: {{ name }}</p>
+    <div class="flex space-x-3">
+      <a href="{% url 'edit_profile' %}" 
+         class="px-5 py-2 bg-gradient-to-br from-cyan-500 to-blue-500 text-white font-medium rounded-lg hover:from-cyan-400 hover:to-blue-600 transition">
+        Edit Profile
+      </a>
+
+      <a href="{% url 'password_change' %}" 
+         class="px-5 py-2 bg-white text-gray-900 font-medium rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-blue-700 transition">
+        Change Password
+      </a>
+    </div>
+  </div>
+
+  <!-- Personal Info & Account Info -->
+  <div class="flex flex-col md:flex-row justify-center gap-4 mb-8">
+
+    <div class="grid grid-cols-1 gap-2 p-4 shadow-sm rounded-lg border w-full md:w-1/2">
+      <h2 class="text-white font-semibold text-xl mb-2">Personal Information</h2>
+      <hr class="border-gray-700 mb-2">
+      <p>Username  : {{ username }}</p>
+      <p>Email     : {{ email }}</p>
+      <p>Phone     : {{ phone_number|default:"N/A" }}</p>
+      <p>Location  : Bangladesh</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-2 p-4 shadow-sm rounded-lg border w-full md:w-1/2">
+      <h2 class="text-white font-semibold text-xl mb-2">Account Information</h2>
+      <hr class="border-gray-700 mb-2">
+      <p>Member Since: {{ member_since | humanized_date }}</p>
+      <p>Last Login  : {{ last_login | humanized_date }}</p>
+    </div>
+  </div>
+
+  <!-- Bio Section -->
+  <div class="grid grid-cols-1 gap-2 p-4 shadow-sm rounded-lg border w-full">
+    <h2 class="text-white font-semibold text-2xl mb-2">Bio</h2>
+    <hr class="border-gray-700 mb-2">
+    <p>{{ bio|default:"I am a passionate software developer, skilled in creating modern web and software solutions. Eager to learn new technologies and adept at solving problems, I strive to deliver high-quality products through clean and efficient code." }}</p>
+  </div>
+
+</div>
+
+{% endblock content %}

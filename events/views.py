@@ -4,8 +4,14 @@ from events.models import Event, Category, Rsvp
 from events.forms import EventModelForm, CategoryModelForm
 from django.db.models import Q
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.generic.list import ListView
+from django.views.generic import DetailView,CreateView,UpdateView,DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin,UserPassesTestMixin
+from django.urls import reverse_lazy
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 
 
 def is_participant(user):
@@ -18,47 +24,62 @@ def is_admin(user):
     return user.is_superuser or user.groups.filter(name='Admin').exists()
 
 
-def event_list(request):
-    user = request.user
-    search = request.GET.get('search', '')
+class EventList(ListView):
+    model = Event
+    template_name = 'event_list.html'
+    context_object_name = 'events'
 
-    if search:
-        events = Event.objects.filter(
+    def get_queryset(self):
+        user = self.request.user
+        search = self.request.GET.get('search', '')
+        
+        if search:
+            events = Event.objects.filter(
             Q(name__icontains=search) | Q(location__icontains=search)
-        ).select_related('category').prefetch_related('rsvp')
-    else:
-        events = Event.objects.select_related('category').prefetch_related('rsvp').all()
+            ).select_related('category').prefetch_related('rsvp')
+        else:
+            events = Event.objects.select_related('category').prefetch_related('rsvp').all()
 
-    if user.is_authenticated:
-        for event in events:
-            event.user_has_rsvped = event.rsvp.filter(user=user).exists()
-    else:
-        for event in events:
-            event.user_has_rsvped = False
-
-    context = {
-        'events': events,
-        'search': search,
-    }
-    return render(request, 'event_list.html', context)
+        if user.is_authenticated:
+            for event in events:
+                event.user_has_rsvped = event.rsvp.filter(user=user).exists()
+        else:
+            for event in events:
+                event.user_has_rsvped = False
+        return events
 
 
-def event_detail(request, id):
-    try:
-        event = Event.objects.get(id=id)
-    except Event.DoesNotExist:
-        messages.error(request, "Event not found.")
-        return redirect('event_list')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search'] = self.request.GET.get('search', '')
+        return context
+    
 
-    user_has_rsvped = False
-    if request.user.is_authenticated:
-        user_has_rsvped = Rsvp.objects.filter(user=request.user, event=event).exists()
+class EventDetail(DetailView):
+    model = Event
+    template_name = 'event/event_detail.html'
+    context_object_name = 'event'
+    pk_url_kwarg = 'id'
 
-    context = {
-        'event': event,
-        'user_has_rsvped': user_has_rsvped,
-    }
-    return render(request, 'event/event_detail.html', context)
+    def get(self, request, *args, **kwargs):
+        try:
+            self.object = Event.objects.get(id=self.kwargs['id'])
+        except Event.DoesNotExist:
+            messages.error(request, "Event not found.")
+            return redirect('event_list')
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        user_has_rsvped = False
+        if self.request.user.is_authenticated:
+            user_has_rsvped = Rsvp.objects.filter(user=self.request.user, event=self.object).exists()
+        context['user_has_rsvped'] = user_has_rsvped
+        
+        return context
+
 
 
 @login_required
@@ -113,55 +134,62 @@ def dashboard(request):
     return render(request, "dashboard.html", context)
 
 
-@login_required
-@user_passes_test(is_organizer, login_url='no_permission')
-def create_event(request):
-    event_form = EventModelForm()
 
-    if request.method == "POST":
-        event_form = EventModelForm(request.POST, request.FILES)
-        if event_form.is_valid():
-            event_form.save()
-            messages.success(request, "Event Created Successfully")
-            return redirect("event_list")
-        else:
-            messages.error(request, "Please correct the errors below.")
-    return render(request, 'event_form.html', {'form': event_form})
+class CreateEvent(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    template_name = 'event_form.html'
+    model = Event
+    form_class = EventModelForm
+    
+    def test_func(self):
+        return is_organizer(self.request.user) or is_admin(self.request.user)
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Event Created Successfully")
+        return super().form_valid(form)
 
+    def form_invalid(self, form):
+        messages.error(self.request, "Please correct the errors below.")
+        return super().form_invalid(form)
 
-@login_required
-@user_passes_test(is_organizer, login_url='no_permission')
-def update_event(request, id):
-    try:
-        event = Event.objects.get(id=id)
-    except Event.DoesNotExist:
-        messages.error(request, "Event not found.")
-        return redirect('event_list')
-
-    event_form = EventModelForm(instance=event)
-
-    if request.method == "POST":
-        event_form = EventModelForm(request.POST, request.FILES, instance=event)
-        if event_form.is_valid():
-            event_form.save()
-            messages.success(request, "Event Updated Successfully")
-            return redirect('event_list')
-        else:
-            messages.error(request, "Please correct the errors below.")
-    return render(request, 'event_form.html', {'form': event_form})
+    def get_success_url(self):
+        return reverse_lazy('event_list')
+    
 
 
-@login_required
-@user_passes_test(is_admin, login_url='no_permission')
-def delete_event(request, id):
-    if request.method == "POST":
-        try:
-            event = Event.objects.get(id=id)
-            event.delete()
-            messages.success(request, 'Event Deleted Successfully')
-        except Event.DoesNotExist:
-            messages.error(request, "Event not found.")
-        return redirect('event_list')
+class UpdateEvent(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
+
+    pk_url_kwarg = 'id'
+    template_name = 'event_form.html'
+    model =Event
+    form_class = EventModelForm
+
+    def test_func(self):
+        return is_organizer(self.request.user) or is_admin(self.request.user)
+        
+    def form_valid(self, form):
+        messages.success(self.request, "Event Updated Successfully")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Please correct the errors below.")
+        return super().form_invalid(form)
+    def get_success_url(self):
+        return reverse_lazy('event_list')
+
+
+
+
+class DeleteEvent(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
+    model = Event
+    pk_url_kwarg = 'id'
+
+    def test_func(self):
+        return is_organizer(self.request.user) or is_admin(self.request.user)
+    
+    def get_success_url(self):
+        messages.success(self.request, "Event Deleted Successfully")
+        return reverse_lazy('event_list')
+
 
 
 @login_required
@@ -223,3 +251,40 @@ def delete_category(request, id):
 
 def first_home(request):
     return render(request, 'first_home.html')
+
+
+
+"""
+@login_required
+@user_passes_test(is_organizer, login_url='no_permission')
+def update_event(request, id):
+    try:
+        event = Event.objects.get(id=id)
+    except Event.DoesNotExist:
+        messages.error(request, "Event not found.")
+        return redirect('event_list')
+
+    event_form = EventModelForm(instance=event)
+
+    if request.method == "POST":
+        event_form = EventModelForm(request.POST, request.FILES, instance=event)
+        if event_form.is_valid():
+            event_form.save()
+            messages.success(request, "Event Updated Successfully")
+            return redirect('event_list')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    return render(request, 'event_form.html', {'form': event_form})
+
+    @login_required
+@user_passes_test(is_admin, login_url='no_permission')
+def delete_event(request, id):
+    if request.method == "POST":
+        try:
+            event = Event.objects.get(id=id)
+            event.delete()
+            messages.success(request, 'Event Deleted Successfully')
+        except Event.DoesNotExist:
+            messages.error(request, "Event not found.")
+        return redirect('event_list')
+"""

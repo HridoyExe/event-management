@@ -1,8 +1,12 @@
 from django import forms
 import re
-from django.contrib.auth.models import User, Permission,Group
+from django.contrib.auth.models import Permission,Group
 from events.forms import StyledFormMixin
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm,PasswordChangeForm,PasswordResetForm,SetPasswordForm
+from users.models import CustomUser
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 class CustomRegistrationForm(StyledFormMixin, forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
@@ -10,6 +14,11 @@ class CustomRegistrationForm(StyledFormMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'password', 'confirm_password']
+
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()  
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -53,6 +62,7 @@ class CustomRegistrationForm(StyledFormMixin, forms.ModelForm):
 class LoginForm(StyledFormMixin, AuthenticationForm):
     def __init__(self, *arg, **kwargs):
         super().__init__(*arg, **kwargs)
+        self.apply_styled_widgets() 
 
 class AssignRoleForm(StyledFormMixin,forms.Form):
     role = forms.ModelChoiceField(
@@ -70,3 +80,26 @@ class CreateGroup(StyledFormMixin, forms.ModelForm):
     class Meta:
         model = Group
         fields = ['name', 'permissions']
+
+
+class CustomChangePasswordForm(StyledFormMixin, PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()
+
+class CustomPasswordResetForm(StyledFormMixin, PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()
+class CustomPasswordResetConfirmForm(StyledFormMixin,SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()
+
+class EditProfileForm(StyledFormMixin, forms.ModelForm):
+    class Meta :
+        model = CustomUser
+        fields = ['email','first_name','last_name','bio','profile_image','phone_number']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()
