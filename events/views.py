@@ -114,7 +114,7 @@ def dashboard(request):
 
 
 @login_required
-@user_passes_test(is_organizer, login_url='no_permission')
+@user_passes_test(lambda u: is_admin(u) or is_organizer(u), login_url='no_permission')
 def create_event(request):
     event_form = EventModelForm()
 
@@ -130,7 +130,7 @@ def create_event(request):
 
 
 @login_required
-@user_passes_test(is_organizer, login_url='no_permission')
+@user_passes_test(lambda u: is_admin(u) or is_organizer(u), login_url='no_permission')
 def update_event(request, id):
     try:
         event = Event.objects.get(id=id)
@@ -152,7 +152,7 @@ def update_event(request, id):
 
 
 @login_required
-@user_passes_test(is_admin, login_url='no_permission')
+@user_passes_test(lambda u: is_admin(u) or is_organizer(u), login_url='no_permission')
 def delete_event(request, id):
     if request.method == "POST":
         try:
@@ -165,7 +165,7 @@ def delete_event(request, id):
 
 
 @login_required
-@user_passes_test(is_organizer, login_url='no_permission')
+@user_passes_test(lambda u: is_admin(u) or is_organizer(u), login_url='no_permission')
 def create_category(request):
     category_form = CategoryModelForm()
     if request.method == 'POST':
@@ -180,14 +180,14 @@ def create_category(request):
 
 
 @login_required
-@user_passes_test(is_organizer, login_url='no_permission')
+@user_passes_test(lambda u: is_admin(u) or is_organizer(u), login_url='no_permission')
 def category_list(request):
     categories = Category.objects.all()
     return render(request, 'category_list.html', {'categories': categories})
 
 
 @login_required
-@user_passes_test(is_organizer, login_url='no_permission')
+@user_passes_test(lambda u: is_admin(u) or is_organizer(u), login_url='no_permission')
 def update_category(request, id):
     try:
         category = Category.objects.get(id=id)

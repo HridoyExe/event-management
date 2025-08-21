@@ -1,6 +1,6 @@
 from django import forms
 import re
-from django.contrib.auth.models import User, Permission,Group
+from django.contrib.auth.models import User, Permission, Group
 from events.forms import StyledFormMixin
 from django.contrib.auth.forms import AuthenticationForm
 class CustomRegistrationForm(StyledFormMixin, forms.ModelForm):
@@ -10,6 +10,10 @@ class CustomRegistrationForm(StyledFormMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'password', 'confirm_password']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -50,15 +54,24 @@ class CustomRegistrationForm(StyledFormMixin, forms.ModelForm):
             raise forms.ValidationError("Passwords do not match")
 
         return cleaned_data
-class LoginForm(StyledFormMixin, AuthenticationForm):
-    def __init__(self, *arg, **kwargs):
-        super().__init__(*arg, **kwargs)
 
-class AssignRoleForm(StyledFormMixin,forms.Form):
+
+class LoginForm(StyledFormMixin, AuthenticationForm):
+    def __init__(self, *args, **kwargs): 
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()
+
+
+class AssignRoleForm(StyledFormMixin, forms.Form):
     role = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         empty_label="Select A Role"
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()
+
 class CreateGroup(StyledFormMixin, forms.ModelForm):
     permissions = forms.ModelMultipleChoiceField(
         queryset=Permission.objects.all(),
@@ -70,3 +83,7 @@ class CreateGroup(StyledFormMixin, forms.ModelForm):
     class Meta:
         model = Group
         fields = ['name', 'permissions']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()
