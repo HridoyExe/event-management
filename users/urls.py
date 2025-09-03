@@ -22,7 +22,7 @@ urlpatterns = [
     path('password-change/',ChangePassword.as_view(), name='password_change'),
     path('password-change/done', PasswordChangeDoneView.as_view(template_name='accounts/password_change_done.html'), name='password_change_done'),
     path('password-reset/',PasswordReset.as_view(),name='password_reset'),
-    path('password-reset/confirm/<uidb64>/<token>',PasswordResetConfirm.as_view(),name='password_reset_confirm' ),
+    path('password-reset/confirm/<uidb64>/<token>/',PasswordResetConfirm.as_view(),name='password_reset_confirm'),
     path('edit-profile/', EditProfileView.as_view(), name='edit_profile')
 
 
