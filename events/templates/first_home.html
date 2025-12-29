@@ -1,133 +1,102 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Management</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
-<body>
 
+{% block content %}
+<!-- Search Hero -->
+<div class="bg-indigo-700 py-16 sm:py-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h1 class="text-4xl font-extrabold text-white sm:text-5xl md:text-6xl tracking-tight">
+      Find Your Next Experience
+    </h1>
+    <p class="mt-4 max-w-2xl mx-auto text-xl text-indigo-100">
+      Discover tech conferences, music festivals, workshops, and more.
+    </p>
 
-
-<nav class="bg-white border-b border-gray-200">
-  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-
-    <div class="flex items-center space-x-4">
-      <h1 class="text-xl font-bold text-red-600-800">Event Management Project</h1>
-    </div>
-
-   
-   
-   
-    <div class="w-full md:w-auto" id="navbar-default">
-
-      <ul class="font-medium flex flex-col p-4 md:p-0 mt-4  rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white">
-        <li>
-          <a href="{% url 'event_list'%}" class="block py-2 px-3 text-blue-500 rounded-sm hover:text-blue-500 hover:bg-transparent">Event</a>
-
-        </li>
-        <li>
-          <a href="{% url 'category_list'%}" class="block py-2 px-3 text-blue-500 rounded-sm hover:text-blue-500 hover:bg-transparent">Category</a>
-
-        </li>
-        <li>
-         <a href="{% url 'participant_list'%}" class="block py-2 px-3 text-blue-500 rounded-sm hover:text-blue-500 hover:bg-transparent">Participate</a>
-        </li>
-        <li>
-          <a href="{% url 'dashboard' %}" class="block py-2 px-3 text-blue-500 rounded-sm hover:text-blue-500 hover:bg-transparent">Go To Dashboard</a>
-        </li>
-         
-      </ul>
-    </div>
-  </div>
-</nav>
-
-
-
-
-
-<form method="get" action="{% url 'event_list' %}" class="max-w-md mx-auto mt-8">   
-    <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
-    <div class="relative">
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-            </svg>
+    <form method="get" action="{% url 'event_list' %}" class="mt-8 max-w-xl mx-auto">
+      <div class="relative group">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg class="h-6 w-6 text-gray-400 group-focus-within:text-indigo-500 transition" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
         </div>
-        <input type="search" name="search" id="default-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search Your Event Here" required />
-        <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 font-medium rounded-lg text-sm px-4 py-2">Search</button>
+        <input type="search" name="search"
+          class="block w-full pl-12 pr-28 py-4 text-gray-900 placeholder-gray-500 bg-white border-0 rounded-full shadow-xl focus:ring-4 focus:ring-indigo-500/30 transition text-lg"
+          placeholder="Search events, locations..." required />
+        <button type="submit"
+          class="absolute right-2 top-2 bottom-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full transition shadow-md">Search</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Featured Section -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Featured Highlights</h2>
+    <p class="mt-3 text-lg text-gray-500">Check out what's happening right now.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- Card 1 -->
+    <div
+      class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 overflow-hidden flex flex-col h-full border border-gray-100">
+      <div class="h-48 bg-gray-200 overflow-hidden relative">
+        <img src="{% static 'images/picone.jpg' %}" alt="Event"
+          class="w-full h-full object-cover transform hover:scale-105 transition duration-500" />
+        <div class="absolute top-0 right-0 bg-indigo-600 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">TODAY
+        </div>
+      </div>
+      <div class="p-6 flex-grow flex flex-col">
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Tech Summit 2025</h3>
+        <p class="text-gray-600 text-sm mb-4 flex-grow">Join the biggest tech innovators for a day of inspiring talks
+          and networking.</p>
+        <button
+          class="w-full mt-auto bg-white text-indigo-600 border border-indigo-200 font-bold py-2 px-4 rounded-xl hover:bg-indigo-50 transition">
+          View Details
+        </button>
+      </div>
     </div>
-</form>
 
+    <!-- Card 2 -->
+    <div
+      class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 overflow-hidden flex flex-col h-full border border-gray-100">
+      <div class="h-48 bg-gray-200 overflow-hidden relative">
+        <img src="{% static 'images/picthree.jpg' %}" alt="Event"
+          class="w-full h-full object-cover transform hover:scale-105 transition duration-500" />
+        <div class="absolute top-0 right-0 bg-green-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">UPCOMING
+        </div>
+      </div>
+      <div class="p-6 flex-grow flex flex-col">
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Music in the Park</h3>
+        <p class="text-gray-600 text-sm mb-4 flex-grow">Experience live music under the stars with local and
+          international artists.</p>
+        <button
+          class="w-full mt-auto bg-white text-indigo-600 border border-indigo-200 font-bold py-2 px-4 rounded-xl hover:bg-indigo-50 transition">
+          View Details
+        </button>
+      </div>
+    </div>
 
-
-
-
-<section class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-10 px-4">
-
-  
-  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-    <h2 class="text-xl font-bold mb-4">Today's Events</h2>
-    
-    <img src="{% static 'images/picone.jpg' %}" alt="Today's Event" class="w-full h-auto rounded-md mb-4" />
-    <p>Details : Lorem ipsum, dolor sit amet consectetur adipisicing elit. Consectetur, ipsum.</p>
-    <button class="relative mt-3 inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
-      <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
-        View Details
-      </span>
-    </button>
+    <!-- Card 3 -->
+    <div
+      class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 overflow-hidden flex flex-col h-full border border-gray-100">
+      <div class="h-48 bg-gray-200 overflow-hidden relative">
+        <img src="{% static 'images/pictwo.jpg' %}" alt="Event"
+          class="w-full h-full object-cover transform hover:scale-105 transition duration-500" />
+        <div class="absolute top-0 right-0 bg-gray-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">PAST</div>
+      </div>
+      <div class="p-6 flex-grow flex flex-col">
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Art Gallery Opening</h3>
+        <p class="text-gray-600 text-sm mb-4 flex-grow">A showcase of modern art pieces from emerging talents across the
+          region.</p>
+        <button
+          class="w-full mt-auto bg-white text-indigo-600 border border-indigo-200 font-bold py-2 px-4 rounded-xl hover:bg-indigo-50 transition">
+          View Details
+        </button>
+      </div>
+    </div>
   </div>
-
-  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-    <h2 class="text-xl font-bold mb-4">Upcoming Events</h2>
-    <img src="{% static 'images/picthree.jpg' %}" alt="Today's Event" class="w-full h-auto rounded-md mb-4" />
-    <p> Details : Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, impedit?</p>
-      <button class="relative mt-3 inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
-      <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
-        View Details
-      </span>
-    </button>
-  
-  </div>
-
-
-  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-    <h2 class="text-xl font-bold mb-4">Past Events</h2>
-    <img src="{% static 'images/pictwo.jpg' %}" alt="Today's Event" class="w-full h-auto rounded-md mb-4" />
-    <p>Deatils : Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem, dignissimos?</p>
-      <button class="relative mt-3 inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
-      <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
-        View Details
-      </span>
-    </button>
-  </div>
-
 </section>
-
-
-
-
-
-
-<footer class="bg-white rounded-lg shadow-sm m-4">
-  <div class="w-full max-w-screen-xl mx-auto p-4 md:py-8">
-    <div class="sm:flex sm:items-center sm:justify-between">
-      <ul class="flex flex-wrap items-center mb-6 text-sm font-medium text-gray-500 sm:mb-0 dark:text-gray-400">
-        <li>
-          <a href="#" class="hover:underline me-4 md:me-6 text-blue-500">About</a>
-        </li>
-        <li>
-          <a href="#" class="hover:underline text-blue-500">Contact</a>
-        </li>
-      </ul>
-    </div>
-    <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-    <span class="block text-sm sm:text-center text-blue-500">© 2025. All Rights Reserved.</span>
-  </div>
-</footer>
-
-
-</body> 
-</html>
+{% endblock content %}

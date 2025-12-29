@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from datetime import date
 from events.models import Event, Category, Rsvp
 from events.forms import EventModelForm, CategoryModelForm
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef, Value, BooleanField
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic.list import ListView
@@ -41,11 +41,19 @@ class EventList(ListView):
             events = Event.objects.select_related('category').prefetch_related('rsvp').all()
 
         if user.is_authenticated:
-            for event in events:
-                event.user_has_rsvped = event.rsvp.filter(user=user).exists()
+            rsvp_subquery = Rsvp.objects.filter(event=OuterRef('pk'), user=user)
+            events = events.annotate(user_has_rsvped=Exists(rsvp_subquery))
         else:
-            for event in events:
-                event.user_has_rsvped = False
+            # For unauthenticated users, the annotation isn't needed or is False.
+            # However, since we use it in the template, we can just not annotate 
+            # and handle it in the template or setting it here might be tricky without looping.
+            # But the template checks `event.user_has_rsvped` which will be missing on the obj if not annotated.
+            # Actually, `Exists` returns a boolean, so it's an attribute on the model instance.
+            # For un/authed we can't easily annotate 'False' without Value.
+            # But we can just leave it; accessing a missing attribute might be an issue?
+            # No, if it's missing, `{% if event.user_has_rsvped %}` is False.
+            pass
+
         return events
 
 

@@ -1,76 +1,317 @@
+{% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}Event Management{% endblock %}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Event Management{% endblock %}</title>
 
-  <!-- Navbar -->
-  <nav class="bg-white shadow p-4 flex justify-between items-center max-w-7xl mx-auto w-full">
-    <div>
-      <a href="{% url 'home' %}" class="text-xl font-bold text-sky-700 hover:text-sky-900">Event Management</a>
-    </div>
-    <div class="flex items-center gap-6">
-      {% if request.user.is_authenticated %}
-        {% include "logged.html" %}
-        {% if user_role == 'Admin' %}
-          <a href="{% url 'admin_dashboard' %}" class="text-blue-600 hover:underline">Go To Admin Dashboard</a>
-          <a href="{% url 'group-list' %}" class="text-blue-600 hover:underline">Groups</a>
-          <a href="{% url 'create-group' %}" class="text-blue-600 hover:underline">Create Group</a>
-          <a href="{% url 'assign-role' user.id %}" class="text-blue-600 hover:underline">Assign Role </a>
-          <a href="{% url 'user-list' %}" class="text-blue-600 hover:underline">User List </a>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        {% elif user_role == 'Organizer' %}
-          <a href="{% url 'organizer_dashboard' %}" class="text-blue-600 hover:underline">Go To Organizer Dashboard</a>
-        {% elif user_role == 'Participant' %}
-          <a href="{% url 'participant_dashboard' %}" class="text-blue-600 hover:underline">Go To Participant Dashboard</a>
-        {% endif %}
-      {% else %}
-        {% include "non_logged.html" %}
     
-      {% endif %}
-    </div>
-  </nav>
-
-  <!-- Main Content -->
-  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-10 text-center">
-    {% block content %}
-    {% endblock content %}
-  </main>
-
-  <!-- Footer -->
-  <footer class="bg-white text-center py-4 shadow-inner mt-auto">
-    <p class="text-gray-600">&copy; 2025 Event Management. All rights reserved.</p>
-  </footer>
-
-  <!-- JS for menu toggling -->
-  <script>
-    const menuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    if (menuButton && mobileMenu) {
-      menuButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-      });
-    }
-
-    const userMenuButton = document.getElementById('user-menu-button');
-    const userMenu = document.getElementById('user-menu');
-
-    if (userMenuButton && userMenu) {
-      userMenuButton.addEventListener('click', () => {
-        userMenu.classList.toggle('hidden');
-      });
-
-      window.addEventListener('click', (e) => {
-        if (!userMenuButton.contains(e.target)) {
-          userMenu.classList.add('hidden');
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5', 
+                        secondary: '#EC4899', 
+                    }
+                }
+            }
         }
-      });
-    }
-  </script>
+    </script>
+
+    <!-- Add any extra CSS here -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex flex-col text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="glass-nav fixed w-full z-50 top-0 transition-all duration-300 placeholder-opacity-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="{% url 'home' %}" class="flex items-center gap-2">
+                        <!-- Icon -->
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                            </path>
+                        </svg>
+                        <span class="font-bold text-xl tracking-tight text-gray-900">Event<span
+                                class="text-indigo-600">Master</span></span>
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{% url 'home' %}"
+                        class="text-gray-600 hover:text-indigo-600 font-medium transition">Home</a>
+                    <a href="{% url 'event_list' %}"
+                        class="text-gray-600 hover:text-indigo-600 font-medium transition">All Events</a>
+
+                    {% if request.user.is_authenticated %}
+                    <!-- Role Based Links -->
+                    {% if request.user|has_group:"Admin" %}
+                    <a href="{% url 'admin_dashboard' %}"
+                        class="text-gray-600 hover:text-indigo-600 font-medium transition">Admin</a>
+                    {% elif request.user|has_group:"Organizer" %}
+                    <a href="{% url 'organizer_dashboard' %}"
+                        class="text-gray-600 hover:text-indigo-600 font-medium transition">Organizer</a>
+                    {% elif request.user|has_group:"Participant" %}
+                    <a href="{% url 'participant_dashboard' %}"
+                        class="text-gray-600 hover:text-indigo-600 font-medium transition">My Dashboard</a>
+                    {% endif %}
+
+                    <!-- User Dropdown -->
+                    <div class="relative ml-4">
+                        <button id="user-menu-btn"
+                            class="flex items-center focus:outline-none ring-2 ring-transparent focus:ring-indigo-500 rounded-full transition">
+                            {% if request.user.profile_image %}
+                            <img class="h-9 w-9 rounded-full object-cover border border-gray-200 shadow-sm"
+                                src="{{ request.user.profile_image.url }}" alt="{{ request.user.username }}">
+                            {% else %}
+                            <div
+                                class="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm border border-indigo-200">
+                                {{ request.user.username|slice:":1"|upper }}
+                            </div>
+                            {% endif %}
+                        </button>
+                        <!-- Dropdown Panel -->
+                        <div id="user-dropdown"
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 hidden transform transition-all duration-200 origin-top-right border border-gray-100">
+                            <div class="px-4 py-2 border-b border-gray-100 mb-1">
+                                <p class="text-sm font-semibold text-gray-900 truncate">{{ request.user.username }}</p>
+                                <p class="text-xs text-gray-500 truncate">{{ request.user.email }}</p>
+                            </div>
+                            {% if request.user|has_group:"Admin" %}
+                            <a href="{% url 'admin_dashboard' %}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition">Dashboard</a>
+                            {% elif request.user|has_group:"Organizer" %}
+                            <a href="{% url 'organizer_dashboard' %}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition">Dashboard</a>
+                            {% elif request.user|has_group:"Participant" %}
+                            <a href="{% url 'participant_dashboard' %}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition">Dashboard</a>
+                            {% endif %}
+                            <a href="{% url 'profile' %}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition">Profile
+                                Settings</a>
+                            <form method="post" action="{% url 'logout' %}" class="w-full">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Sign
+                                    Out</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="flex items-center space-x-3">
+                        <a href="{% url 'sign-in' %}"
+                            class="text-gray-600 hover:text-indigo-600 font-medium transition">Log In</a>
+                        <a href="{% url 'sign-up' %}"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium shadow-md hover:bg-indigo-700 hover:shadow-lg transition transform hover:-translate-y-0.5">Sign
+                            Up</a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="{% url 'home' %}"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Home</a>
+                <a href="{% url 'event_list' %}"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">All
+                    Events</a>
+
+                {% if request.user.is_authenticated %}
+                {% if request.user|has_group:"Admin" %}
+                <a href="{% url 'admin_dashboard' %}"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Admin
+                    Dashboard</a>
+                {% elif request.user|has_group:"Organizer" %}
+                <a href="{% url 'organizer_dashboard' %}"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Organizer
+                    Dashboard</a>
+                {% elif request.user|has_group:"Participant" %}
+                <a href="{% url 'participant_dashboard' %}"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">My
+                    Dashboard</a>
+                {% endif %}
+                <div class="border-t border-gray-100 my-2"></div>
+                <a href="{% url 'profile' %}"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Profile</a>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                        class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50">Sign
+                        Out</button>
+                </form>
+                {% else %}
+                <div class="border-t border-gray-100 my-2"></div>
+                <a href="{% url 'sign-in' %}"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Log
+                    In</a>
+                <a href="{% url 'sign-up' %}"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:bg-indigo-50 font-bold">Sign
+                    Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-20"> <!-- pt-20 to push content below fixed navbar -->
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+            <div class="rounded-md p-4 mb-4 flex items-center shadow-sm
+                    {% if message.tags == 'error' %}bg-red-50 text-red-700 border-l-4 border-red-500
+                    {% elif message.tags == 'success' %}bg-green-50 text-green-700 border-l-4 border-green-500
+                    {% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-700 border-l-4 border-yellow-500
+                    {% else %}bg-blue-50 text-blue-700 border-l-4 border-blue-500{% endif %}">
+                <div class="flex-shrink-0 mr-3">
+                    <!-- Icons based on tag -->
+                    {% if message.tags == 'success' %}
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% elif message.tags == 'error' %}
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% endif %}
+                </div>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-auto">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-4">EventMaster</h3>
+                    <p class="text-gray-400 text-sm">Simplifying event management for organizers and participants alike.
+                        Join us today.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-200 mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="{% url 'home' %}" class="hover:text-white transition">Home</a></li>
+                        <li><a href="{% url 'event_list' %}" class="hover:text-white transition">Events</a></li>
+                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-200 mb-4">Connect With Us</h4>
+                    <div class="flex space-x-4">
+                        <!-- Social Icons (Placeholders) -->
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <span class="sr-only">Facebook</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <span class="sr-only">Twitter</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-500">
+                &copy; 2025 EventMaster. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // User Menu Dropdown
+        const userMenuBtn = document.getElementById('user-menu-btn');
+        const userDropdown = document.getElementById('user-dropdown');
+
+        if (userMenuBtn && userDropdown) {
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('hidden');
+            });
+
+            window.addEventListener('click', () => {
+                if (!userDropdown.classList.contains('hidden')) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+
+            userDropdown.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent closing when clicking inside
+            });
+        }
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
 </body>
+
 </html>

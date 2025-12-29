@@ -1,14 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>No Access</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="h-screen bg-gray-100 flex items-center justify-center">
-  <p class="text-gray-600 text-lg bg-white px-6 py-4 rounded-lg shadow-md">
-    You can not access this page.
-  </p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Access Denied - EventMaster{% endblock title %}
+
+{% block content %}
+<div class="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
+    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+      <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    </div>
+    <h2 class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight">Access Denied</h2>
+    <p class="mt-4 text-base text-gray-500">
+      You do not have permission to view this page.
+    </p>
+    <div class="mt-6">
+      <a href="{% url 'home' %}" class="text-base font-medium text-indigo-600 hover:text-indigo-500">
+        Go back home<span aria-hidden="true"> &rarr;</span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -1,80 +1,92 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Participant List</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-6">
 
-  <nav class="bg-white border-b border-gray-200 mb-6">
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-    <div class="w-full md:w-auto" id="navbar-default">
-      <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+      <div class="flex-1 min-w-0">
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          Participants List
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Manage all registered participants for your events.</p>
+      </div>
+      <div class="mt-4 flex md:mt-0 md:ml-4">
+        <a href="{% url 'create_participant' %}"
+          class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Add Participant
+        </a>
+      </div>
+    </div>
+
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <ul class="divide-y divide-gray-200">
+        {% for participant in participants %}
         <li>
-          <a href="{% url 'event_list' %}" class="block py-2 px-3 text-blue-500 rounded-sm hover:text-blue-500 hover:bg-transparent">Event</a>
+          <div class="px-4 py-4 sm:px-6 hover:bg-gray-50 transition duration-150 ease-in-out">
+            <div class="flex items-center justify-between">
+              <div class="sm:flex sm:items-center sm:justify-between w-full">
+                <div class="truncate">
+                  <div class="flex text-sm">
+                    <p class="font-medium text-indigo-600 truncate">{{ participant.name }}</p>
+                    <p class="ml-1 flex-shrink-0 font-normal text-gray-500">
+                      &lt;{{ participant.email }}&gt;
+                    </p>
+                  </div>
+                  <div class="mt-2 flex">
+                    <div class="flex items-center text-sm text-gray-500">
+                      <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
+                      </svg>
+                      <p>
+                        Events joined: <span class="font-medium text-gray-900">{{ participant.events.count }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
+                  <div class="flex space-x-3">
+                    <a href="{% url 'update_participant' participant.id %}"
+                      class="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-xs font-medium rounded text-indigo-700 bg-indigo-50 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                      Edit
+                    </a>
+                    <form action="{% url 'delete_participant' participant.id %}" method="POST"
+                      onsubmit="return confirm('Are you sure you want to remove this participant?');">
+                      {% csrf_token %}
+                      <button type="submit"
+                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Remove
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </li>
-        <li>
-          <a href="{% url 'category_list' %}" class="block py-2 px-3 text-blue-500 rounded-sm hover:text-blue-500 hover:bg-transparent">Category</a>
+        {% empty %}
+        <li class="px-4 py-12 sm:px-6 text-center">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+            </path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No participants yet</h3>
+          <p class="mt-1 text-sm text-gray-500">Get started by creating a new participant.</p>
+          <div class="mt-6">
+            <a href="{% url 'create_participant' %}"
+              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Add Participant
+            </a>
+          </div>
         </li>
-        <li>
-          <a href="{% url 'participant_list' %}" class="block py-2 px-3 text-blue-500 rounded-sm hover:text-blue-500 hover:bg-transparent">Participate</a>
-        </li>
-        <li>
-          <a href="{% url 'dashboard' %}" class="block py-2 px-3 text-blue-500 rounded-sm hover:text-blue-500 hover:bg-transparent">Go To Dashboard</a>
-        </li>
+        {% endfor %}
       </ul>
     </div>
-    <div class="flex space-x-4">
-    
-        <a href="{% url 'create_participant' %}" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">Create Participant</a>
-        <a href="{% url 'create_event' %}" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">Create Event</a>
-         <a href="{% url 'create_category' %}" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">Create Category</a>
-     </div>
   </div>
-</nav>
-
-
-
-    {% if messages %}
-      <div class="mb-6">
-        {% for message in messages %}
-          <div class="p-4 rounded mb-3 bg-gray-100 text-gray-800 {% if message.tags == 'success' %}bg-green-200 text-green-800{% endif %}">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Participants List</h1>
-
-    <ul>
-      {% for participant in participants %}
-        <li class="mb-4 border border-gray-300 rounded p-4 bg-white">
-          <h2 class="text-xl font-semibold mb-1">Participant Name: {{ participant.name }}</h2>
-          <p class="text-gray-600 mb-1">Participant Email: {{ participant.email }}</p>
-          <p class="text-gray-600">Event Count: {{ participant.events.count }}</p>
-
-          <div class="flex space-x-3 mt-2">
-            <a href="{% url 'update_participant' participant.id %}" class="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-              Edit
-            </a>
-            <form action="{% url 'delete_participant' participant.id %}" method="POST">
-              {% csrf_token %}
-              <button type="submit" class="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition">
-                Delete
-              </button>
-            </form>
-          </div>
-        </li>
-      {% empty %}
-        <li class="text-center text-gray-500 py-4">No Participant Found</li>
-      {% endfor %}
-    </ul>
-
-  </div>
-</body>
-</html>
+</div>
+{% endblock content %}

@@ -1,67 +1,112 @@
 {% extends "base.html" %}
 {% load custom_filters %}
-{% block title %}Profile{% endblock title %}
+
+{% block title %}My Profile - EventMaster{% endblock title %}
+
 {% block content %}
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
 
-<div class="bg-slate-900 text-slate-200 min-h-screen p-6">
-
-  <div class="text-center my-6">
-    <h1 class="text-3xl font-bold text-blue-500 mb-2">My Profile</h1>
-    <hr class="border-t-2 border-sky-400 w-1/2 mx-auto my-4">
-  </div>
-
-  <div class="flex flex-col items-center mb-8 space-y-4">
-    <!-- Profile Picture -->
-    <div class="rounded-full bg-sky-400 flex items-center justify-center w-32 h-32 overflow-hidden">
-      {% if profile_image %}
-    <img src="{{ profile_image.url }}" alt="Profile Picture" class="object-cover w-full h-full rounded-full">
-{% else %}
-    <img src="/media/profile_image/default.jpg" alt="Default Profile Picture" class="object-cover w-full h-full rounded-full">
-{% endif %}
-
+    <!-- Profile Header Card -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-32 md:h-48"></div>
+      <div class="relative px-6 pb-6">
+        <div class="flex flex-col md:flex-row items-center md:items-end -mt-16 md:-mt-20 mb-4 md:mb-0">
+          <div class="relative">
+            {% if user.profile_image %}
+            <img class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg object-cover"
+              src="{{ user.profile_image.url }}" alt="{{ user.username }}">
+            {% else %}
+            <div
+              class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg bg-indigo-100 flex items-center justify-center text-4xl font-bold text-indigo-600">
+              {{ user.username|slice:":1"|upper }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="mt-4 md:mt-0 md:ml-6 text-center md:text-left flex-1">
+            <h1 class="text-3xl font-bold text-gray-900">{{ user.get_full_name|default:user.username }}</h1>
+            <p class="text-sm text-gray-500 font-medium">@{{ user.username }}</p>
+          </div>
+          <div class="mt-6 md:mt-0 flex space-x-3">
+            <a href="{% url 'edit_profile' %}"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Edit Profile
+            </a>
+            <a href="{% url 'password_change' %}"
+              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Change Password
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <p class="text-xl font-bold text-white">Name: {{ name }}</p>
-    <div class="flex space-x-3">
-      <a href="{% url 'edit_profile' %}" 
-         class="px-5 py-2 bg-gradient-to-br from-cyan-500 to-blue-500 text-white font-medium rounded-lg hover:from-cyan-400 hover:to-blue-600 transition">
-        Edit Profile
-      </a>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Sidebar Info -->
+      <div class="space-y-8">
+        <!-- Personal Info -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2">Personal Info</h2>
+          <ul class="space-y-3 text-sm">
+            <li class="flex justify-between">
+              <span class="text-gray-500">Email</span>
+              <span class="text-gray-900 font-medium">{{ user.email }}</span>
+            </li>
+            <li class="flex justify-between">
+              <span class="text-gray-500">Phone</span>
+              <span class="text-gray-900 font-medium">{{ user.phone_number|default:"Not set" }}</span>
+            </li>
+            <li class="flex justify-between">
+              <span class="text-gray-500">Location</span>
+              <span class="text-gray-900 font-medium">Bangladesh</span>
+            </li>
+          </ul>
+        </div>
 
-      <a href="{% url 'password_change' %}" 
-         class="px-5 py-2 bg-white text-gray-900 font-medium rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-blue-700 transition">
-        Change Password
-      </a>
+        <!-- Account Stats -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2">Account Stats</h2>
+          <ul class="space-y-3 text-sm">
+            <li class="flex justify-between">
+              <span class="text-gray-500">Joined</span>
+              <span class="text-gray-900 font-medium">{{ user.date_joined|date:"M d, Y" }}</span>
+            </li>
+            <li class="flex justify-between">
+              <span class="text-gray-500">Last Login</span>
+              <span class="text-gray-900 font-medium">{{ user.last_login|timesince }} ago</span>
+            </li>
+            <li class="flex justify-between">
+              <span class="text-gray-500">Role</span>
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                {% if user|has_group:"Admin" %}Admin
+                {% elif user|has_group:"Organizer" %}Organizer
+                {% elif user|has_group:"Participant" %}Participant
+                {% else %}User{% endif %}
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main Content (Bio) -->
+      <div class="md:col-span-2 space-y-8">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">About Me</h2>
+          <div class="prose prose-indigo text-gray-500 text-sm leading-relaxed">
+            {% if user.bio %}
+            {{ user.bio|linebreaks }}
+            {% else %}
+            <p class="italic text-gray-400">No bio added yet. Click 'Edit Profile' to tell us about yourself.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Recent Activity Placeholder (Optional) -->
+        <!-- This could be expanded later to show recent RSVPs or created events -->
+      </div>
     </div>
+
   </div>
-
-  <!-- Personal Info & Account Info -->
-  <div class="flex flex-col md:flex-row justify-center gap-4 mb-8">
-
-    <div class="grid grid-cols-1 gap-2 p-4 shadow-sm rounded-lg border w-full md:w-1/2">
-      <h2 class="text-white font-semibold text-xl mb-2">Personal Information</h2>
-      <hr class="border-gray-700 mb-2">
-      <p>Username  : {{ username }}</p>
-      <p>Email     : {{ email }}</p>
-      <p>Phone     : {{ phone_number|default:"N/A" }}</p>
-      <p>Location  : Bangladesh</p>
-    </div>
-
-    <div class="grid grid-cols-1 gap-2 p-4 shadow-sm rounded-lg border w-full md:w-1/2">
-      <h2 class="text-white font-semibold text-xl mb-2">Account Information</h2>
-      <hr class="border-gray-700 mb-2">
-      <p>Member Since: {{ member_since | humanized_date }}</p>
-      <p>Last Login  : {{ last_login | humanized_date }}</p>
-    </div>
-  </div>
-
-  <!-- Bio Section -->
-  <div class="grid grid-cols-1 gap-2 p-4 shadow-sm rounded-lg border w-full">
-    <h2 class="text-white font-semibold text-2xl mb-2">Bio</h2>
-    <hr class="border-gray-700 mb-2">
-    <p>{{ bio|default:"I am a passionate software developer, skilled in creating modern web and software solutions. Eager to learn new technologies and adept at solving problems, I strive to deliver high-quality products through clean and efficient code." }}</p>
-  </div>
-
 </div>
-
 {% endblock content %}

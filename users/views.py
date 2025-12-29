@@ -168,7 +168,7 @@ def create_group(request):
         if form.is_valid():
             group = form.save()
             messages.success(request, f"Group {group.name} has been created Successfully")
-            return redirect('create_group')
+            return redirect('create-group')
     return render(request, 'admin/create_group.html', {"form": form})
 
 @user_passes_test(is_admin, login_url='no_permission')
